@@ -1,33 +1,41 @@
 const pool = require('../config/db');
 
 const ProductModel = {
-    getAll: async () => {
-        const [rows] = await pool.execute('SELECT * FROM products');
-        return rows;
-    },
-
-    getById: async (id) => {
-        const [rows] = await pool.execute('SELECT * FROM products WHERE id = ?', [id]);
-        return rows[0];
-    },
-
-    create: async ({ name, price, stock }) => {
+    create: async (name, description, price, stock, imageUrl) => {
         const [result] = await pool.execute(
-            'INSERT INTO products (name, price, stock) VALUES (?, ?, ?)',
-            [name, price, stock]
+            'INSERT INTO products (name, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?)',
+            [name, description, price, stock, imageUrl]
         );
         return result.insertId;
     },
 
-    update: async (id, { name, price, stock }) => {
-        await pool.execute(
-            'UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?',
-            [name, price, stock, id]
+    findById: async (id) => {
+        const [rows] = await pool.execute(
+            'SELECT * FROM products WHERE id = ?',
+            [id]
         );
+        return rows[0];
+    },
+
+    update: async (id, name, description, price, stock, imageUrl) => {
+        const [result] = await pool.execute(
+            'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, image_url = ? WHERE id = ?',
+            [name, description, price, stock, imageUrl, id]
+        );
+        return result.affectedRows;
     },
 
     delete: async (id) => {
-        await pool.execute('DELETE FROM products WHERE id = ?', [id]);
+        const [result] = await pool.execute(
+            'DELETE FROM products WHERE id = ?',
+            [id]
+        );
+        return result.affectedRows;
+    },
+
+    getAll: async () => {
+        const [rows] = await pool.execute('SELECT * FROM products');
+        return rows;
     }
 };
 
